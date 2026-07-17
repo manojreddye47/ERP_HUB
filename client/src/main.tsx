@@ -392,19 +392,20 @@ const App: React.FC = () => {
       showToast('Seeding sample warehouse database...', 'info');
 
       const mockItems = [
-        { sku: 'PROD-001', name: 'Industrial Steel Pipe', category: 'Steel Alloys', quantity: 45, price: 29.99, location: 'Bin A-12', min_threshold: 10 },
-        { sku: 'PROD-002', name: 'Copper Wire Spool 50m', category: 'Electrical', quantity: 8, price: 45.50, location: 'Shelf B-04', min_threshold: 15 },
-        { sku: 'PROD-003', name: 'Heavy Duty Caster Wheel', category: 'Hardware', quantity: 120, price: 12.99, location: 'Aisle C-01', min_threshold: 20 },
-        { sku: 'PROD-004', name: 'Lithium-Ion Battery Pack', category: 'Electrical', quantity: 18, price: 89.99, location: 'Locker E-08', min_threshold: 5 },
-        { sku: 'PROD-005', name: 'Pneumatic Valve Assembly', category: 'Hydraulics', quantity: 32, price: 150.00, location: 'Shelf D-02', min_threshold: 8 },
-        { sku: 'PROD-006', name: 'Aluminum Angle Bar 2m', category: 'Steel Alloys', quantity: 75, price: 18.50, location: 'Bin A-15', min_threshold: 15 },
-        { sku: 'PROD-007', name: 'Optical Sensor Bracket', category: 'Hardware', quantity: 4, price: 8.75, location: 'Aisle C-04', min_threshold: 10 }
+        { sku: 'PROD-001', name: 'Industrial Steel Pipe', category: 'Steel Alloys', quantity: 45, price: 29.99, location: 'Bin A-12', min_threshold: 10, ageDays: 5 },
+        { sku: 'PROD-002', name: 'Copper Wire Spool 50m', category: 'Electrical', quantity: 8, price: 45.50, location: 'Shelf B-04', min_threshold: 15, ageDays: 4 },
+        { sku: 'PROD-003', name: 'Heavy Duty Caster Wheel', category: 'Hardware', quantity: 120, price: 12.99, location: 'Aisle C-01', min_threshold: 20, ageDays: 22 },
+        { sku: 'PROD-004', name: 'Lithium-Ion Battery Pack', category: 'Electrical', quantity: 18, price: 89.99, location: 'Locker E-08', min_threshold: 5, ageDays: 18 },
+        { sku: 'PROD-005', name: 'Pneumatic Valve Assembly', category: 'Hydraulics', quantity: 32, price: 150.00, location: 'Shelf D-02', min_threshold: 8, ageDays: 40 },
+        { sku: 'PROD-006', name: 'Aluminum Angle Bar 2m', category: 'Steel Alloys', quantity: 75, price: 18.50, location: 'Bin A-15', min_threshold: 15, ageDays: 35 },
+        { sku: 'PROD-007', name: 'Optical Sensor Bracket', category: 'Hardware', quantity: 4, price: 8.75, location: 'Aisle C-04', min_threshold: 10, ageDays: 3 }
       ];
 
       for (const item of mockItems) {
+        const { ageDays, ...data } = item;
         await setDoc(doc(db, 'inventory', item.sku), {
-          ...item,
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days ago
+          ...data,
+          created_at: new Date(Date.now() - ageDays * 24 * 60 * 60 * 1000).toISOString()
         });
       }
 
