@@ -326,6 +326,40 @@ const App: React.FC = () => {
         quantity: increment(changeQty)
       });
 
+      // Calculate the new quantity level
+      const newQty = matchedItem.quantity + changeQty;
+
+      // Check for automated vendor order trigger:
+      // Fast moving stock (< 14 days old) & drops below safety threshold (min_threshold)
+      const createdDate = matchedItem.created_at ? new Date(matchedItem.created_at) : new Date();
+      const ageDays = Math.max(0, Math.floor((new Date().getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)));
+      const isFastMoving = ageDays < 14;
+
+      if (type === 'OUTBOUND' && isFastMoving && newQty < matchedItem.min_threshold) {
+        const orderId = `order_${Date.now()}`;
+        const orderQty = 2 * matchedItem.min_threshold;
+        const cleanCat = matchedItem.category.toLowerCase().replace(/[^a-z]/g, '');
+        const vendorEmail = `vendor.${cleanCat || 'general'}@nexus.com`;
+        
+        await setDoc(doc(db, 'vendor_orders', orderId), {
+          id: orderId,
+          sku: sku,
+          itemName: matchedItem.name,
+          category: matchedItem.category,
+          currentQty: newQty,
+          threshold: matchedItem.min_threshold,
+          orderQty: orderQty,
+          vendorEmail: vendorEmail,
+          status: 'Dispatched',
+          sentAt: new Date().toISOString(),
+          emailSubject: `URGENT Replenishment: SKU ${sku} (${matchedItem.name})`,
+          emailBody: `Dear Vendor Partners,\n\nThis is an automated purchase order from Nexus Waretrack. Our inventory levels for the high-velocity item "${matchedItem.name}" (SKU: ${sku}) have dropped below the safety limit.\n\nCurrent Stock Level: ${newQty} units (Safety Threshold: ${matchedItem.min_threshold} units).\n\nPlease dispatch an order of ${orderQty} units immediately (calculated at two times the safety limit).\n\nPlease reply with dispatch confirmation and shipping details.\n\nNexus ERP Operations Console`
+        });
+
+        // Trigger warning toast
+        showToast(`🚨 Automated replenishment email sent to ${vendorEmail} for ${orderQty} units of ${sku}!`, 'warning');
+      }
+
       const txDocRef = doc(db, 'transactions', sync_id);
       await setDoc(txDocRef, {
         sku,
@@ -363,6 +397,33 @@ const App: React.FC = () => {
         await updateDoc(skuDocRef, {
           quantity: increment(changeQty)
         });
+
+        const newQty = itemObj.quantity + changeQty;
+        const createdDate = itemObj.created_at ? new Date(itemObj.created_at) : new Date();
+        const ageDays = Math.max(0, Math.floor((new Date().getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)));
+        const isFastMoving = ageDays < 14;
+
+        if (op.type === 'OUTBOUND' && isFastMoving && newQty < itemObj.min_threshold) {
+          const orderId = `order_${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+          const orderQty = 2 * itemObj.min_threshold;
+          const cleanCat = itemObj.category.toLowerCase().replace(/[^a-z]/g, '');
+          const vendorEmail = `vendor.${cleanCat || 'general'}@nexus.com`;
+          
+          await setDoc(doc(db, 'vendor_orders', orderId), {
+            id: orderId,
+            sku: op.sku,
+            itemName: itemObj.name,
+            category: itemObj.category,
+            currentQty: newQty,
+            threshold: itemObj.min_threshold,
+            orderQty: orderQty,
+            vendorEmail: vendorEmail,
+            status: 'Dispatched',
+            sentAt: new Date().toISOString(),
+            emailSubject: `URGENT Replenishment: SKU ${op.sku} (${itemObj.name})`,
+            emailBody: `Dear Vendor Partners,\n\nThis is an automated purchase order from Nexus Waretrack. Our inventory levels for the high-velocity item "${itemObj.name}" (SKU: ${op.sku}) have dropped below the safety limit.\n\nCurrent Stock Level: ${newQty} units (Safety Threshold: ${itemObj.min_threshold} units).\n\nPlease dispatch an order of ${orderQty} units immediately (calculated at two times the safety limit).\n\nPlease reply with dispatch confirmation and shipping details.\n\nNexus ERP Operations Console`
+          });
+        }
 
         const txDocRef = doc(db, 'transactions', op.id);
         await setDoc(txDocRef, {
