@@ -357,15 +357,32 @@ const App: React.FC = () => {
         });
 
         // Trigger warning toast
-        showToast(`🚨 Low Stock! Dispatched automated replenishment email to ${vendorEmail} for ${orderQty} units!`, 'warning');
+        showToast(`🚨 Low Stock! Automated replenishment email dispatched silently to ${vendorEmail} for ${orderQty} units!`, 'warning');
 
-        // Dispatch real email via default system mail client
-        const mailSubject = `URGENT Replenishment: SKU ${sku} (${matchedItem.name})`;
-        const mailBody = `Dear Vendor Partners,\n\nThis is an automated purchase order from Nexus Waretrack. Our inventory levels for the high-velocity item "${matchedItem.name}" (SKU: ${sku}) have dropped below the safety limit.\n\nCurrent Stock Level: ${newQty} units (Safety Threshold: ${matchedItem.min_threshold} units).\n\nPlease dispatch an order of ${orderQty} units immediately (calculated at two times the safety limit).\n\nPlease reply with dispatch confirmation and shipping details.\n\nNexus ERP Operations Console`;
-        
-        setTimeout(() => {
-          window.location.href = `mailto:${vendorEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-        }, 800);
+        // Silent background email dispatch via FormSubmit AJAX API
+        fetch(`https://formsubmit.co/ajax/${vendorEmail}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            _subject: `URGENT Replenishment: SKU ${sku} (${matchedItem.name})`,
+            _honey: '',
+            message: `Dear Vendor Partners,\n\nThis is an automated purchase order from Nexus Waretrack. Our inventory levels for the high-velocity item "${matchedItem.name}" (SKU: ${sku}) have dropped below the safety limit.\n\nCurrent Stock Level: ${newQty} units (Safety Threshold: ${matchedItem.min_threshold} units).\n\nPlease dispatch an order of ${orderQty} units immediately (calculated at two times the safety limit).\n\nPlease reply with dispatch confirmation and shipping details.\n\nBest regards,\nNexus Waretrack ERP`
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success === 'true' || data.success === true) {
+            console.log("Automated vendor email sent successfully:", data);
+          } else {
+            console.warn("FormSubmit response:", data);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to silently dispatch vendor email:", err);
+        });
       }
 
       const txDocRef = doc(db, 'transactions', sync_id);
