@@ -1,0 +1,32 @@
+{
+  "name": "nexus-waretrack-client",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "firebase": "^12.16.0",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "socket.io-client": "^4.7.5",
+    "three": "^0.165.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.165.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1"
+  }
+}

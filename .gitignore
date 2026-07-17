@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Production builds
+dist/
+client/dist/
+
+# Vercel and local environment configs
+.vercel/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
