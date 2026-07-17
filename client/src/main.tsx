@@ -357,7 +357,15 @@ const App: React.FC = () => {
         });
 
         // Trigger warning toast
-        showToast(`🚨 Automated replenishment email sent to ${vendorEmail} for ${orderQty} units of ${sku}!`, 'warning');
+        showToast(`🚨 Low Stock! Dispatched automated replenishment email to ${vendorEmail} for ${orderQty} units!`, 'warning');
+
+        // Dispatch real email via default system mail client
+        const mailSubject = `URGENT Replenishment: SKU ${sku} (${matchedItem.name})`;
+        const mailBody = `Dear Vendor Partners,\n\nThis is an automated purchase order from Nexus Waretrack. Our inventory levels for the high-velocity item "${matchedItem.name}" (SKU: ${sku}) have dropped below the safety limit.\n\nCurrent Stock Level: ${newQty} units (Safety Threshold: ${matchedItem.min_threshold} units).\n\nPlease dispatch an order of ${orderQty} units immediately (calculated at two times the safety limit).\n\nPlease reply with dispatch confirmation and shipping details.\n\nNexus ERP Operations Console`;
+        
+        setTimeout(() => {
+          window.location.href = `mailto:${vendorEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+        }, 800);
       }
 
       const txDocRef = doc(db, 'transactions', sync_id);
