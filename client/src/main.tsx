@@ -7,6 +7,7 @@ import Inventory from './views/Inventory';
 import Operations from './views/Operations';
 import Employees from './views/Employees';
 import { Attendance } from './views/Attendance';
+import { StockAging } from './views/StockAging';
 import Chatbot from './components/Chatbot';
 import './index.css';
 import { 
@@ -16,7 +17,7 @@ import {
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from './firebase';
 import { 
-  LayoutDashboard, Package, RefreshCw, Users, CheckSquare, Calendar, LogOut, Bell, BellOff, Menu, X, Sun, Moon, Trash2 
+  LayoutDashboard, Package, RefreshCw, Users, CheckSquare, Calendar, LogOut, Bell, BellOff, Menu, X, Sun, Moon, Trash2, Hourglass 
 } from 'lucide-react';
 
 interface UserProfile {
@@ -723,6 +724,17 @@ const App: React.FC = () => {
           </li>
           <li>
             <a 
+              className={`sidebar-link ${activeTab === 'stock-aging' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('stock-aging');
+                setIsSidebarOpen(false);
+              }}
+            >
+              <Hourglass size={18} /> Stock Aging
+            </a>
+          </li>
+          <li>
+            <a 
               className={`sidebar-link ${activeTab === 'operations' ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab('operations');
@@ -852,6 +864,11 @@ const App: React.FC = () => {
             onAddSku={handleAddSku} 
             onEditSku={handleEditSku} 
             onDeleteSku={handleDeleteSku} 
+          />
+        )}
+        {activeTab === 'stock-aging' && (
+          <StockAging 
+            inventory={inventory} 
           />
         )}
         {activeTab === 'operations' && (
