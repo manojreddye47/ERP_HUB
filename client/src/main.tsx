@@ -339,7 +339,7 @@ const App: React.FC = () => {
         const orderId = `order_${Date.now()}`;
         const orderQty = 2 * matchedItem.min_threshold;
         const cleanCat = matchedItem.category.toLowerCase().replace(/[^a-z]/g, '');
-        const vendorEmail = `vendor.${cleanCat || 'general'}@nexus.com`;
+        const vendorEmail = matchedItem.vendor_email || `vendor.${cleanCat || 'general'}@nexus.com`;
         
         await setDoc(doc(db, 'vendor_orders', orderId), {
           id: orderId,
@@ -407,7 +407,7 @@ const App: React.FC = () => {
           const orderId = `order_${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
           const orderQty = 2 * itemObj.min_threshold;
           const cleanCat = itemObj.category.toLowerCase().replace(/[^a-z]/g, '');
-          const vendorEmail = `vendor.${cleanCat || 'general'}@nexus.com`;
+          const vendorEmail = itemObj.vendor_email || `vendor.${cleanCat || 'general'}@nexus.com`;
           
           await setDoc(doc(db, 'vendor_orders', orderId), {
             id: orderId,
@@ -474,13 +474,13 @@ const App: React.FC = () => {
       showToast('Seeding distributed sample database...', 'info');
 
       const mockItems = [
-        { sku: 'PROD-001', name: 'Industrial Steel Pipe', category: 'Steel Alloys', quantity: 45, price: 29.99, location: 'Bin A-12', min_threshold: 10, ageDays: 5 },
-        { sku: 'PROD-002', name: 'Copper Wire Spool 50m', category: 'Electrical', quantity: 8, price: 45.50, location: 'Shelf B-04', min_threshold: 15, ageDays: 4 },
-        { sku: 'PROD-003', name: 'Heavy Duty Caster Wheel', category: 'Hardware', quantity: 120, price: 12.99, location: 'Aisle C-01', min_threshold: 20, ageDays: 22 },
-        { sku: 'PROD-004', name: 'Lithium-Ion Battery Pack', category: 'Electrical', quantity: 18, price: 89.99, location: 'Locker E-08', min_threshold: 5, ageDays: 18 },
-        { sku: 'PROD-005', name: 'Pneumatic Valve Assembly', category: 'Hydraulics', quantity: 32, price: 150.00, location: 'Shelf D-02', min_threshold: 8, ageDays: 40 },
-        { sku: 'PROD-006', name: 'Aluminum Angle Bar 2m', category: 'Steel Alloys', quantity: 75, price: 18.50, location: 'Bin A-15', min_threshold: 15, ageDays: 35 },
-        { sku: 'PROD-007', name: 'Optical Sensor Bracket', category: 'Hardware', quantity: 4, price: 8.75, location: 'Aisle C-04', min_threshold: 10, ageDays: 3 }
+        { sku: 'PROD-001', name: 'Industrial Steel Pipe', category: 'Steel Alloys', quantity: 45, price: 29.99, location: 'Bin A-12', min_threshold: 10, ageDays: 5, vendor_name: 'Apex Steel Industries', vendor_email: 'steel-supplies@nexus-vendors.com' },
+        { sku: 'PROD-002', name: 'Copper Wire Spool 50m', category: 'Electrical', quantity: 8, price: 45.50, location: 'Shelf B-04', min_threshold: 15, ageDays: 4, vendor_name: 'ElectroWire Ltd', vendor_email: 'copper-cables@nexus-vendors.com' },
+        { sku: 'PROD-003', name: 'Heavy Duty Caster Wheel', category: 'Hardware', quantity: 120, price: 12.99, location: 'Aisle C-01', min_threshold: 20, ageDays: 22, vendor_name: 'IndusParts Co', vendor_email: 'hardware-parts@nexus-vendors.com' },
+        { sku: 'PROD-004', name: 'Lithium-Ion Battery Pack', category: 'Electrical', quantity: 18, price: 89.99, location: 'Locker E-08', min_threshold: 5, ageDays: 18, vendor_name: 'VoltEnergy Solutions', vendor_email: 'battery-tech@nexus-vendors.com' },
+        { sku: 'PROD-005', name: 'Pneumatic Valve Assembly', category: 'Hydraulics', quantity: 32, price: 150.00, location: 'Shelf D-02', min_threshold: 8, ageDays: 40, vendor_name: 'PneuFlow Systems', vendor_email: 'valve-flows@nexus-vendors.com' },
+        { sku: 'PROD-006', name: 'Aluminum Angle Bar 2m', category: 'Steel Alloys', quantity: 75, price: 18.50, location: 'Bin A-15', min_threshold: 15, ageDays: 35, vendor_name: 'Apex Steel Industries', vendor_email: 'steel-supplies@nexus-vendors.com' },
+        { sku: 'PROD-007', name: 'Optical Sensor Bracket', category: 'Hardware', quantity: 4, price: 8.75, location: 'Aisle C-04', min_threshold: 10, ageDays: 3, vendor_name: 'OptiShield Tech', vendor_email: 'sensor-brackets@nexus-vendors.com' }
       ];
 
       for (const item of mockItems) {
