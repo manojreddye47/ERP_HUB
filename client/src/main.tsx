@@ -10,7 +10,7 @@ import { Attendance } from './views/Attendance';
 import Chatbot from './components/Chatbot';
 import './index.css';
 import { 
-  collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, 
+  collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, getDocs,
   increment, query, orderBy, limit, where 
 } from 'firebase/firestore';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -389,7 +389,27 @@ const App: React.FC = () => {
 
   const handleSeedMockData = async () => {
     try {
-      showToast('Seeding sample warehouse database...', 'info');
+      showToast('Clearing existing database collections...', 'info');
+
+      // 1. Clear Inventory
+      const invSnap = await getDocs(collection(db, 'inventory'));
+      for (const d of invSnap.docs) {
+        await deleteDoc(d.ref);
+      }
+
+      // 2. Clear Transactions
+      const txSnap = await getDocs(collection(db, 'transactions'));
+      for (const d of txSnap.docs) {
+        await deleteDoc(d.ref);
+      }
+
+      // 3. Clear Tasks
+      const tasksSnap = await getDocs(collection(db, 'tasks'));
+      for (const d of tasksSnap.docs) {
+        await deleteDoc(d.ref);
+      }
+
+      showToast('Seeding distributed sample database...', 'info');
 
       const mockItems = [
         { sku: 'PROD-001', name: 'Industrial Steel Pipe', category: 'Steel Alloys', quantity: 45, price: 29.99, location: 'Bin A-12', min_threshold: 10, ageDays: 5 },

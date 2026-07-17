@@ -126,7 +126,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, inventory, transacti
 
   return (
     <div className="page-container animate-slide-up">
-      {inventory.length === 0 && !isStaff && onSeedMockData && (
+      {/* Welcome banner for non-admin users when empty */}
+      {inventory.length === 0 && user.role !== 'Administrator' && !isStaff && onSeedMockData && (
         <div className="panel-glass" style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', border: '1px solid rgba(92, 107, 192, 0.4)' }}>
           <div>
             <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px' }}>Welcome to Nexus Waretrack ERP</h4>
@@ -134,6 +135,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, inventory, transacti
           </div>
           <button onClick={onSeedMockData} className="btn btn-primary" style={{ padding: '10px 16px', whiteSpace: 'nowrap' }}>
             Seed Sample Database
+          </button>
+        </div>
+      )}
+
+      {/* Admin seeding and database reset controller */}
+      {user.role === 'Administrator' && onSeedMockData && (
+        <div className="panel-glass animate-slide-up" style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', border: '1px solid rgba(239, 68, 68, 0.2)', backgroundColor: 'rgba(239, 68, 68, 0.02)' }}>
+          <div>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px' }}>⚡ System Seed & Database Reset Console</h4>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+              Clear out all current products, transactions, and tasks, and seed the Firestore database with fresh mock items distributed across the Stock Aging categories.
+            </p>
+          </div>
+          <button 
+            onClick={() => {
+              if (window.confirm("Warning: This will completely erase ALL products, transactions, and tasks in the database and seed it fresh. Do you wish to proceed?")) {
+                onSeedMockData();
+              }
+            }} 
+            className="btn btn-primary" 
+            style={{ 
+              padding: '10px 16px', 
+              whiteSpace: 'nowrap', 
+              backgroundColor: 'var(--danger)', 
+              borderColor: 'var(--danger)' 
+            }}
+          >
+            Reset Database & Seed Mock Data
           </button>
         </div>
       )}
